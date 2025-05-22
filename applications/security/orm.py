@@ -4,6 +4,8 @@ from django.contrib.contenttypes.models import ContentType
 
 from applications.security.models import GroupModulePermission, Menu, Module, User
 
+# field name: applications/security/arm.py
+
 # Create Menus - using save() and create()
 menu1 = Menu(
     name='Pacientes',

@@ -1,6 +1,9 @@
 from django.db.models import Q
 
 from applications.security.models import Menu, Module
+
+# field name: applications/security/arm_query2.py
+
 # Obtener el módulo "Registro de Pacientes" por su URL
 modulo_pacientes = Module.objects.get(url='pacientes/')
 print(modulo_pacientes)
