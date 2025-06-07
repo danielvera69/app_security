@@ -16,6 +16,7 @@ Ejemplos:
 3. Finanzas (icon: bi bi-cash-coin, order: 3) - Agrupa módulos financieros
 """
 class Menu(models.Model):
+   
     name = models.CharField(verbose_name='Nombre', max_length=150, unique=True)
     icon = models.CharField(verbose_name='Icono', max_length=100, default='bi bi-calendar-x-fill')
     order = models.PositiveSmallIntegerField(verbose_name='Orden', default=0)
@@ -23,6 +24,8 @@ class Menu(models.Model):
     def __str__(self):
         return self.name
 
+   
+   
     class Meta:
         verbose_name = 'Menu'
         verbose_name_plural = 'Menus'
@@ -46,6 +49,7 @@ class Module(models.Model):
     icon = models.CharField(verbose_name='Icono', max_length=100, default='bi bi-x-octagon')
     is_active = models.BooleanField(verbose_name='Es activo', default=True)
     order = models.PositiveSmallIntegerField(verbose_name='Orden', default=0)
+  
     permissions = models.ManyToManyField(Permission, blank=True)
 
     def __str__(self):
@@ -67,20 +71,19 @@ Ejemplos:
 3. Bodegueros - Stock: permisos [view_stock, add_stock, change_stock]
 """
 class GroupModulePermissionManager(models.Manager):
-    def get_active_modules_for_group(self, group_id):
-        return self.select_related('module', 'module__menu').filter(
+    """ Obtiene los módulos con su respectivo menú del grupo requerido que estén activos """ 
+    def get_group_module_permission_active_list(self, group_id):
+        return self.select_related('module','module__menu').filter(
             group_id=group_id,
             module__is_active=True
         )
-
-
+    
 class GroupModulePermission(models.Model):
     group = models.ForeignKey(Group, on_delete=models.PROTECT, verbose_name='Grupo', related_name='module_permissions')
-    module = models.ForeignKey(Module, on_delete=models.PROTECT, verbose_name='Módulo', related_name='group_permissions')
+    module = models.ForeignKey('security.Module', on_delete=models.PROTECT, verbose_name='Módulo', related_name='group_permissions')
     permissions = models.ManyToManyField(Permission, verbose_name='Permisos')
-    
+    # Manager personalizado (conserva toda la funcionalidad del manager por defecto)
     objects = GroupModulePermissionManager()
-
     def __str__(self):
         return f"{self.module.name} - {self.group.name}"
 
@@ -110,6 +113,7 @@ class User(AbstractUser, PermissionsMixin):
         blank=True,
         null=True
     )
+    
     email = models.EmailField('Email', unique=True)
     direction = models.CharField('Dirección', max_length=200, blank=True, null=True)
     phone = models.CharField('Teléfono', max_length=50, blank=True, null=True)
@@ -126,25 +130,51 @@ class User(AbstractUser, PermissionsMixin):
             ("change_userpassword", "Cambiar contraseña de Usuario"),
         )
     
-    def save(self, *args, **kwargs):
-        def password_needs_hashing(password):
-            # Detecta si la contraseña ya está hasheada
-            return not password.startswith('pbkdf2_') and not password.startswith('argon2') and not password.startswith('bcrypt')
+    # def save(self, *args, **kwargs):
+    #     def password_needs_hashing(password):
+    #         # Detecta si la contraseña ya está hasheada
+    #         return not password.startswith('pbkdf2_') and not password.startswith('argon2') and not password.startswith('bcrypt')
 
-        if self.pk is None:
-            if password_needs_hashing(self.password):
-                self.set_password(self.password)
-        else:
-            old = User.objects.get(pk=self.pk)
-            if self.password != old.password and password_needs_hashing(self.password):
-                self.set_password(self.password)
+    #     if self.pk is None:
+    #         if password_needs_hashing(self.password):
+    #             self.set_password(self.password)
+    #     else:
+    #         old = User.objects.get(pk=self.pk)
+    #         if self.password != old.password and password_needs_hashing(self.password):
+    #             self.set_password(self.password)
 
-        super().save(*args, **kwargs)
+    #     super().save(*args, **kwargs)
 
             
+    @property
     def get_full_name(self):
         return f"{self.first_name} {self.last_name}"
 
-    def get_image_url(self):
-        return self.image.url if self.image else '/static/img/usuario_anonimo.png'
+    def get_groups(self):
+        return self.groups.all()
 
+    def get_short_name(self):
+        return self.username
+
+    def get_group_session(self):
+        request = get_current_request()
+        print("request==>",request)
+        return Group.objects.get(pk=request.session['group_id'])
+
+    def set_group_session(self):
+        request = get_current_request()
+
+        if 'group' not in request.session:
+
+            groups = request.user.groups.all().order_by('id')
+
+            if groups.exists():
+                request.session['group'] = groups.first()
+                request.session['group_id'] = request.session['group'].id
+
+    
+    def get_image(self):
+        if self.image:
+            return self.image.url
+        else:
+            return '/static/img/usuario_anonimo.png'

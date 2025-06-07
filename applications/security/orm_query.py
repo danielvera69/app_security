@@ -118,7 +118,7 @@ pausar_y_limpiar()
 
 # Consulta 17: Búsqueda que contiene (case sensitive)
 print("Sentencia: Menu.objects.filter(name__contains='admin')")
-menus_contiene = Menu.objects.filter(name__contains='admin')
+menus_contiene = Menu.objects.filter(name__icontains='admin')
 print("Resultado:", menus_contiene)
 pausar_y_limpiar()
 
@@ -217,3 +217,21 @@ print("Sentencia: Menu.objects.all()[5:10]")
 menus_segmento = Menu.objects.all()[5:10]
 print("Resultado:", menus_segmento)
 pausar_y_limpiar()
+""" Module.objects.filter( Q(url__icontains="security") & Q(id__lt=9) )
+Out[42]: SELECT "security_module"."id",
+       "security_module"."url",
+       "security_module"."name",
+       "security_module"."menu_id",
+       "security_module"."description",
+       "security_module"."icon",
+       "security_module"."is_active",
+       "security_module"."order"
+  FROM "security_module"
+ INNER JOIN "security_menu"
+    ON ("security_module"."menu_id" = "security_menu"."id")
+ WHERE (UPPER("security_module"."url"::text) LIKE UPPER('%security%') AND "security_module"."id" < 9)     
+ ORDER BY "security_menu"."order" ASC,
+          "security_menu"."name" ASC,
+          "security_module"."order" ASC,
+          "security_module"."name" ASC
+ LIMIT 21 """

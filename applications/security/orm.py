@@ -1,16 +1,22 @@
 from django.db import models
 from django.contrib.auth.models import Group, Permission
 from django.contrib.contenttypes.models import ContentType
-
 from applications.security.models import GroupModulePermission, Menu, Module, User
 
 # field name: applications/security/arm.py
 
 # Create Menus - using save() and create()
 menu1 = Menu(
-    name='Pacientes',
+    name='Registros',
     icon='bi bi-person',
-    order=1
+    order=7
+)
+menu1.save()
+
+menu1 = Menu(
+    name='Emergencia',
+    icon='fa fa-person',
+    order=7
 )
 menu1.save()
 
@@ -21,7 +27,7 @@ menu2 = Menu.objects.create(
 )
 
 menu3 = Menu.objects.create(
-    name='Administración',
+    name='Auditores',
     icon='bi bi-gear',
     order=4
 )
@@ -58,8 +64,8 @@ module1, module2, module3, module4, module5, module6, module7, module8, module9 
 
 # Create Users
 user1 = User.objects.create(
-    username='drgomez',
-    email='drgomez@clinica.med',
+    username='drgomez2',
+    email='drgomezz@clinica.med',
     password='secure123!',
     first_name='Carlos',
     last_name='Gómez',

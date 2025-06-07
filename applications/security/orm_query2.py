@@ -1,3 +1,4 @@
+import os
 from django.db.models import Q
 
 from applications.security.models import Menu, Module
@@ -5,24 +6,31 @@ from applications.security.models import Menu, Module
 # field name: applications/security/arm_query2.py
 
 # Obtener el módulo "Registro de Pacientes" por su URL
+def pausar_y_limpiar():
+    input("Presione una tecla para continuar...")
+    os.system('cls' if os.name == 'nt' else 'clear')
+    
 modulo_pacientes = Module.objects.get(url='pacientes/')
 print(modulo_pacientes)
+pausar_y_limpiar()
 # Salida: Registro de Pacientes
 
 # Obtener el módulo "Configuración" por su nombre
 modulo_config = Module.objects.get(name='Configuración')
 print(f"URL: {modulo_config.url}, Menú: {modulo_config.menu.name}")
 # Salida: URL: configuracion/, Menú: Administración
+pausar_y_limpiar()
 
 # Obtener un módulo por su ID (asumiendo que el ID de "Citas" es 4)
 modulo_citas = Module.objects.get(id=4)
 print(f"{modulo_citas.name} - {modulo_citas.description}")
 # Salida: Citas - Programación de citas médicas
-
+pausar_y_limpiar()
 # Obtener todos los módulos del menú "Pacientes"
 modulos_pacientes = Module.objects.filter(menu__name='Pacientes')
 for m in modulos_pacientes:
     print(m.name)
+pausar_y_limpiar()
 # Salida:
 # Registro de Pacientes
 # Historial Médico
@@ -32,6 +40,7 @@ for m in modulos_pacientes:
 modulos_gestion = Module.objects.filter(description__icontains='gestión')
 for m in modulos_gestion:
     print(f"{m.name}: {m.description}")
+pausar_y_limpiar()
 # Salida:
 # Registro de Pacientes: Gestión de información de pacientes
 # Usuarios: Gestión de usuarios del sistema
@@ -40,6 +49,7 @@ for m in modulos_gestion:
 modulos_primeros = Module.objects.filter(order__lt=2)
 for m in modulos_primeros:
     print(f"{m.name} (Menú: {m.menu.name})")
+pausar_y_limpiar()
 # Salida:
 # Registro de Pacientes (Menú: Pacientes)
 # Citas (Menú: Consultas)
@@ -49,6 +59,7 @@ for m in modulos_primeros:
 modulos_admin_avanzados = Module.objects.filter(menu__name='Administración', order__gt=1)
 for m in modulos_admin_avanzados:
     print(f"{m.name} (order: {m.order})")
+pausar_y_limpiar()
 # Salida:
 # Configuración (order: 2)
 # Reportes (order: 3)
@@ -60,6 +71,7 @@ modulos_principales = Module.objects.filter(
 )
 for m in modulos_principales:
     print(f"{m.name} (Menú: {m.menu.name})")
+pausar_y_limpiar()
 # Salida:
 # Registro de Pacientes (Menú: Pacientes)
 # Citas (Menú: Consultas)
@@ -135,6 +147,7 @@ conteo_por_menu = Menu.objects.annotate(total_modules=Count('modules')).values('
 print("Cantidad de módulos por menú:")
 for item in conteo_por_menu:
     print(f"- {item['name']}: {item['total_modules']} módulos")
+x=input("Presione una tecla para continuar...")
 # Salida:
 # Cantidad de módulos por menú:
 # - Pacientes: 3 módulos

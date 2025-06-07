@@ -19,10 +19,12 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 
-from applications.security.views import home
+from applications.security.views.home import ModuloTemplateView
+from applications.security.views.auth import signin, signout
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', home, name='home'),
+    path('', ModuloTemplateView.as_view(), name='home'),
+    path('security/', include('applications.security.urls', namespace='security')),
     path("__reload__/", include("django_browser_reload.urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
