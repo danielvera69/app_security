@@ -38,14 +38,15 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 ]
+
 # Aplicaciones de terceros
 THIRD_PARTY_APPS = [
     'django_extensions', 
     'tailwind', 
     'theme',
     'django_browser_reload', 
-
 ]
+
 # Aplicaciones propias
 LOCAL_APPS = [
     'applications.security.apps.SecurityConfig',

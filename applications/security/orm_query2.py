@@ -2,6 +2,9 @@ import os
 from django.db.models import Q
 
 from applications.security.models import Menu, Module
+
+# field name: applications/security/arm_query2.py
+
 # Obtener el módulo "Registro de Pacientes" por su URL
 def pausar_y_limpiar():
     input("Presione una tecla para continuar...")
