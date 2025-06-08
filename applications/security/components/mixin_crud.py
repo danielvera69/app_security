@@ -21,6 +21,10 @@ class ListViewMixin(object):
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
+        
+        print("---------------------------------- get_context_data", user.is_superuser )
+        
+        
         context = super().get_context_data(**kwargs)
         context['title'] = f'{self.model._meta.verbose_name_plural}'
         context['title1'] = f'Consulta de {self.model._meta.verbose_name_plural}'
@@ -82,41 +86,44 @@ class PermissionMixin(object):
     def get(self, request, *args, **kwargs):
         try:
             user = request.user
-            user_session=UserGroupSession(request)
+            user_session = UserGroupSession(request)
             user_session.set_group_session()
 
             if 'group_id' not in request.session:
                 return redirect('home')
-
+            
+            print("********************************", user.is_superuser)
             if user.is_superuser:
                 return super().get(request, *args, **kwargs)
 
-           
             group = user_session.get_group_session()
             permissions = self._get_permissions_to_validate() 
             print("permissions", permissions)
-            if not permissions.__len__():
-                print("entro permisos vacios")
+
+            if not permissions:
                 return super().get(request, *args, **kwargs)
 
             if not group.module_permissions.filter(
                     permissions__codename__in=permissions
             ).exists():
-                print("no tengo permiso")
                 messages.error(request, 'No tiene permiso para ingresar a este módulo')
                 return redirect('home')
 
             return super().get(request, *args, **kwargs)
 
         except Exception as ex:
+            # Registra el error real para depurarlo
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Error en PermissionMixin: {ex}", exc_info=True)
+
+            # Mostrar página de error o mensaje en lugar de redirigir
             messages.error(
                 request,
-                'A ocurrido un error al ingresar al modulo, error para el admin es : {}'.format(ex))
-
-        if request.user.is_authenticated:
-            return redirect('home')
-
-        return redirect('security:auth_login')
+                'Ocurrió un error al procesar tu solicitud. Por favor contacta al administrador.'
+            )
+            # return render(request, 'error.html')  # Crea una plantilla simple de error
+        
 
     def _get_permissions_to_validate(self):
 
