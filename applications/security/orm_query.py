@@ -2,6 +2,7 @@ import os
 from applications.security.models import Menu
 from django.db.models import Q, Count, Max, Min, Avg
 
+# field name: applications/security/arm_query.py
 def pausar_y_limpiar():
     input("Presione una tecla para continuar...")
     os.system('cls' if os.name == 'nt' else 'clear')
